@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>수술비·질병분류 통합조회부</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
@@ -383,63 +382,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   *{transition:none !important;}
 }
 
-
-/* Admin Styles */
-.brand-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-.brand-row .brand { margin-bottom: 0; }
-.admin-zone { display: flex; gap: 8px; align-items: center; }
-.ghost-btn { background: transparent; border: 1px solid var(--brass); color: var(--brass); padding: 4px 10px; border-radius: var(--radius); cursor: pointer; font-size: 12px; transition: all 0.2s; }
-.ghost-btn:hover { background: var(--brass); color: var(--navy); }
-.admin-panel { background: var(--teal-soft); padding: 12px 24px; display: flex; gap: 12px; border-bottom: 1px solid var(--paper-line); align-items: center; flex-wrap: wrap; }
-.admin-btn { background: var(--teal); color: white; border: none; padding: 6px 12px; border-radius: var(--radius); cursor: pointer; font-size: 13px; }
-.admin-btn:hover { background: var(--navy); }
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; }
-.modal-overlay.active { display: flex; }
-.modal { background: white; padding: 24px; border-radius: 6px; width: 100%; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-.modal.large { max-width: 600px; }
-.modal h2 { margin-top: 0; font-size: 18px; color: var(--navy); margin-bottom: 16px; }
-.modal-form-group { margin-bottom: 12px; }
-.modal-form-group label { display: block; font-size: 12px; color: var(--ink-soft); margin-bottom: 4px; }
-.modal-form-group input { width: 100%; padding: 8px; border: 1px solid var(--paper-line); border-radius: var(--radius); }
-.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
-.btn-primary { background: var(--focus); color: white; border: none; padding: 8px 16px; border-radius: var(--radius); cursor: pointer; }
-.btn-cancel { background: var(--paper-line); color: var(--ink); border: none; padding: 8px 16px; border-radius: var(--radius); cursor: pointer; }
-.edit-btn { background: var(--mute-soft); border: 1px solid var(--mute); color: var(--ink); border-radius: 3px; font-size: 11px; padding: 2px 6px; cursor: pointer; margin-left: 8px; display:none; }
-.admin-active .edit-btn { display:inline-block; }
-.tab.hidden-tab { display: none !important; }
-.admin-active .tab.hidden-tab { display: inline-block !important; opacity: 0.4; }
-.tab .toggle-hide-btn { margin-left: 6px; cursor: pointer; font-size: 12px; display:none; color:var(--brick);}
-.admin-active.tab-edit-mode .tab .toggle-hide-btn { display:inline; }
-
-
-@media (max-width: 600px) {
-  .brand-row { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .admin-zone { width: 100%; justify-content: flex-end; }
-  .masthead { padding: 16px 16px 20px; }
-  .tabs { padding: 0 12px; }
-  main { padding: 0 12px 30px; }
-  .admin-panel { padding: 12px 16px; gap: 8px; flex-direction: column; align-items: stretch; }
-  .admin-panel > * { width: 100%; text-align: center; }
-  .admin-panel > label { margin-top: 8px; justify-content: center; }
-}
-
 </style>
 </head>
 <body>
 
 <header class="masthead">
   <div class="masthead-inner">
-    <div class="brand-row">
-      <div class="brand">
-        <span class="brand-mark">§</span>
-        <div class="brand-text">
-          <h1>수술비·질병분류 통합조회부</h1>
-          <p class="brand-sub">보험청구 보장여부 확인용 · 2022.01 기준 데이터</p>
-        </div>
-      </div>
-      <div class="admin-zone">
-        <button id="adminLoginBtn" class="ghost-btn">관리자 로그인</button>
-        <button id="adminLogoutBtn" class="ghost-btn" style="display:none;">로그아웃</button>
+    <div class="brand">
+      <span class="brand-mark">§</span>
+      <div class="brand-text">
+        <h1>수술비·질병분류 통합조회부</h1>
+        <p class="brand-sub">보험청구 보장여부 확인용 · 2022.01 기준 데이터</p>
       </div>
     </div>
     <div class="search-wrap">
@@ -449,49 +402,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     </div>
   </div>
 </header>
-
-
-<div id="adminPanel" class="admin-panel" style="display:none;">
-  <button id="addCodeBtn" class="admin-btn">새 항목 추가</button>
-  <button id="uploadExcelBtn" class="admin-btn">엑셀 업로드</button>
-  <button id="downloadHtmlBtn" class="admin-btn" style="background:#8C8579">HTML로 저장하기</button>
-  <button id="resetDataBtn" class="admin-btn" style="background:var(--brick)">추가/수정 초기화</button>
-  <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;margin-left:auto;">
-    <input type="checkbox" id="tabEditMode"> 탭 숨김 관리 모드
-  </label>
-  <input type="file" id="excelFileInput" style="display:none" accept=".xlsx,.xls,.csv">
-</div>
-
-<!-- Admin Login Modal -->
-<div id="loginModal" class="modal-overlay">
-  <div class="modal">
-    <h2>관리자 로그인</h2>
-    <div class="modal-form-group">
-      <label>비밀번호</label>
-      <input type="password" id="adminPw" placeholder="비밀번호를 입력하세요">
-    </div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="document.getElementById('loginModal').classList.remove('active')">취소</button>
-      <button class="btn-primary" id="loginSubmitBtn">로그인</button>
-    </div>
-  </div>
-</div>
-
-<!-- Code Edit/Add Modal -->
-<div id="editModal" class="modal-overlay">
-  <div class="modal large">
-    <h2 id="editModalTitle">항목 추가/수정</h2>
-    <div class="modal-form-group">
-      <label>대상 탭 (시트)</label>
-      <select id="editSheetSelect" style="width:100%;padding:8px;"></select>
-    </div>
-    <div id="editFormFields" style="max-height:60vh;overflow-y:auto;padding-right:10px;"></div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="document.getElementById('editModal').classList.remove('active')">취소</button>
-      <button class="btn-primary" id="editSubmitBtn">저장</button>
-    </div>
-  </div>
-</div>
 
 <nav class="tabs" id="tabs" role="tablist">
   <button class="tab active" data-tab="all" role="tab">통합검색<span class="tab-note">전체</span></button>
@@ -764,301 +674,6 @@ document.getElementById("tabs").addEventListener("click", e => {
 });
 
 let debounceTimer = null;
-
-/* Admin Feature Variables */
-let isAdmin = false;
-let hiddenTabs = JSON.parse(localStorage.getItem('hiddenTabs') || '[]');
-let customData = JSON.parse(localStorage.getItem('customData') || '{}');
-let editCurrentRow = null;
-
-/* Merge Custom Data on Load */
-function mergeCustomData() {
-  for (let key in customData) {
-    if (DATA[key] && customData[key]) {
-      // For each custom row, either update existing or push new
-      customData[key].forEach(customRow => {
-        let exists = false;
-        // Compare by the first 4 columns to find a match (e.g. Number, Code, Name)
-        for (let i = 0; i < DATA[key].rows.length; i++) {
-          if (JSON.stringify(DATA[key].rows[i].slice(0,4)) === JSON.stringify(customRow.slice(0,4))) {
-            DATA[key].rows[i] = customRow;
-            exists = true;
-            break;
-          }
-        }
-        if (!exists) {
-          DATA[key].rows.push(customRow);
-        }
-      });
-    }
-  }
-}
-mergeCustomData();
-
-function applyHiddenTabs() {
-  document.querySelectorAll('.tab').forEach(tab => {
-    const key = tab.dataset.tab;
-    if (key !== 'all' && hiddenTabs.includes(key)) {
-      tab.classList.add('hidden-tab');
-    } else {
-      tab.classList.remove('hidden-tab');
-    }
-  });
-}
-
-// Modify bodyRows to add Edit button
-const originalBodyRows = bodyRows;
-bodyRows = function(cfg, rows, q, cap) {
-  let html = '';
-  let count = 0;
-  for (let r of rows) {
-    if (count >= cap) break;
-    html += '<div class="grid-row" data-row-json="' + encodeURIComponent(JSON.stringify(r)) + '" data-sheet-key="' + cfg.key + '">';
-    for (let i = 0; i < cfg.cols.length; i++) {
-      let val = r[i] || '';
-      if (typeof val === 'string') val = highlight(val, q);
-      html += '<div class="cell ' + (i === 0 ? 'num' : '') + '" data-label="' + esc(cfg.cols[i]) + '">' + val + '</div>';
-    }
-    // Add edit button inside the last cell or a new cell, we'll append it to the last cell visually
-    html += '<button class="edit-btn" onclick="openEditModal(this)">수정</button>';
-    html += '</div>';
-    count++;
-  }
-  return html;
-};
-
-// Override render function slightly
-const originalRender = render;
-render = function() {
-  applyHiddenTabs();
-  originalRender();
-  if (isAdmin) document.body.classList.add('admin-active');
-  else document.body.classList.remove('admin-active');
-};
-
-// Admin Login
-document.getElementById('adminLoginBtn')?.addEventListener('click', () => {
-  document.getElementById('loginModal').classList.add('active');
-  document.getElementById('adminPw').value = '';
-  setTimeout(() => document.getElementById('adminPw').focus(), 100);
-});
-
-document.getElementById('loginSubmitBtn')?.addEventListener('click', () => {
-  const pw = document.getElementById('adminPw').value;
-  if (pw === '2464') {
-    isAdmin = true;
-    document.getElementById('loginModal').classList.remove('active');
-    document.getElementById('adminLoginBtn').style.display = 'none';
-    document.getElementById('adminLogoutBtn').style.display = 'inline-block';
-    document.getElementById('adminPanel').style.display = 'flex';
-    document.body.classList.add('admin-active');
-    render();
-  } else {
-    alert('비밀번호가 틀렸습니다.');
-  }
-});
-
-document.getElementById('adminPw')?.addEventListener('keyup', (e) => {
-  if (e.key === 'Enter') document.getElementById('loginSubmitBtn').click();
-});
-
-document.getElementById('adminLogoutBtn')?.addEventListener('click', () => {
-  isAdmin = false;
-  document.getElementById('adminLoginBtn').style.display = 'inline-block';
-  document.getElementById('adminLogoutBtn').style.display = 'none';
-  document.getElementById('adminPanel').style.display = 'none';
-  document.body.classList.remove('admin-active');
-  document.getElementById('tabEditMode').checked = false;
-  document.body.classList.remove('tab-edit-mode');
-  render();
-});
-
-// Tab Edit Mode
-document.getElementById('tabEditMode')?.addEventListener('change', (e) => {
-  if (e.target.checked) {
-    document.body.classList.add('tab-edit-mode');
-  } else {
-    document.body.classList.remove('tab-edit-mode');
-  }
-});
-
-// Setup Toggle Hide Buttons on Tabs
-document.querySelectorAll('.tab').forEach(tab => {
-  if (tab.dataset.tab === 'all') return;
-  const btn = document.createElement('span');
-  btn.className = 'toggle-hide-btn';
-  btn.innerHTML = '👁️';
-  btn.title = '탭 숨김/해제';
-  tab.appendChild(btn);
-  
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (!isAdmin) return;
-    const key = tab.dataset.tab;
-    if (hiddenTabs.includes(key)) {
-      hiddenTabs = hiddenTabs.filter(k => k !== key);
-    } else {
-      hiddenTabs.push(key);
-    }
-    localStorage.setItem('hiddenTabs', JSON.stringify(hiddenTabs));
-    applyHiddenTabs();
-  });
-});
-
-// Reset Data
-document.getElementById('resetDataBtn')?.addEventListener('click', () => {
-  if (confirm('로컬에 저장된 모든 추가/수정 데이터 및 탭 숨김 설정을 초기화하시겠습니까? 새로고침 후 적용됩니다.')) {
-    localStorage.removeItem('customData');
-    localStorage.removeItem('hiddenTabs');
-    location.reload();
-  }
-});
-
-// Excel Upload
-document.getElementById('uploadExcelBtn')?.addEventListener('click', () => {
-  document.getElementById('excelFileInput').click();
-});
-document.getElementById('excelFileInput')?.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(event) {
-    const data = new Uint8Array(event.target.result);
-    const workbook = XLSX.read(data, {type: 'array'});
-    
-    // We assume the user uploads an excel with sheet names matching our keys (s1, s2, ...) or tab labels
-    let updatedCount = 0;
-    workbook.SheetNames.forEach(sheetName => {
-      // find matching key
-      let key = null;
-      if (DATA[sheetName]) key = sheetName;
-      else {
-        // try finding by label
-        for (let k in CONFIG) {
-          if (CONFIG[k].label === sheetName) { key = k; break; }
-        }
-      }
-      if (key && DATA[key]) {
-        const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1});
-        if (sheetData.length > 1) { // Header exists
-          const rows = sheetData.slice(1);
-          if (!customData[key]) customData[key] = [];
-          rows.forEach(r => {
-            // pad row array to match col length
-            while (r.length < CONFIG[key].cols.length) r.push('');
-            customData[key].push(r);
-            updatedCount++;
-          });
-        }
-      }
-    });
-    
-    if (updatedCount > 0) {
-      localStorage.setItem('customData', JSON.stringify(customData));
-      mergeCustomData();
-      render();
-      alert(`성공적으로 ${updatedCount}건의 데이터를 업데이트했습니다!`);
-    } else {
-      alert('엑셀 파일에서 호환되는 데이터를 찾을 수 없습니다. 시트명이 탭 이름과 일치해야 합니다.');
-    }
-    document.getElementById('excelFileInput').value = '';
-  };
-  reader.readAsArrayBuffer(file);
-});
-
-// Add/Edit Code Modal
-function openEditModal(btn) {
-  editCurrentRow = null;
-  let key = 's1';
-  let values = [];
-  
-  if (btn) {
-    const rowEl = btn.closest('.grid-row');
-    key = rowEl.dataset.sheetKey;
-    values = JSON.parse(decodeURIComponent(rowEl.dataset.rowJson));
-    editCurrentRow = values;
-    document.getElementById('editModalTitle').textContent = '항목 수정';
-  } else {
-    document.getElementById('editModalTitle').textContent = '새 항목 추가';
-    key = document.querySelector('.tab.active').dataset.tab;
-    if (key === 'all') key = 's1';
-  }
-  
-  // Build sheet options
-  const select = document.getElementById('editSheetSelect');
-  select.innerHTML = '';
-  for (let k in CONFIG) {
-    select.innerHTML += `<option value="${k}" ${k===key?'selected':''}>${CONFIG[k].label}</option>`;
-  }
-  
-  buildEditForm(key, values);
-  select.onchange = (e) => buildEditForm(e.target.value, []);
-  
-  document.getElementById('editModal').classList.add('active');
-}
-
-function buildEditForm(key, values) {
-  const cfg = CONFIG[key];
-  const container = document.getElementById('editFormFields');
-  container.innerHTML = '';
-  cfg.cols.forEach((col, idx) => {
-    const val = values[idx] || '';
-    container.innerHTML += `
-      <div class="modal-form-group">
-        <label>${col}</label>
-        <input type="text" class="edit-input" data-idx="${idx}" value="${esc(val.toString())}">
-      </div>
-    `;
-  });
-}
-
-document.getElementById('addCodeBtn')?.addEventListener('click', () => {
-  openEditModal(null);
-});
-
-document.getElementById('editSubmitBtn')?.addEventListener('click', () => {
-  const key = document.getElementById('editSheetSelect').value;
-  const cfg = CONFIG[key];
-  const inputs = document.querySelectorAll('.edit-input');
-  const newRow = [];
-  inputs.forEach(inp => {
-    newRow[parseInt(inp.dataset.idx)] = inp.value;
-  });
-  
-  if (!customData[key]) customData[key] = [];
-  
-  if (editCurrentRow) {
-    // Editing existing. We find it in customData if it exists, else add it
-    let foundInCustom = false;
-    for (let i=0; i<customData[key].length; i++) {
-       if (JSON.stringify(customData[key][i]) === JSON.stringify(editCurrentRow)) {
-         customData[key][i] = newRow;
-         foundInCustom = true;
-         break;
-       }
-    }
-    if (!foundInCustom) {
-      customData[key].push(newRow);
-    }
-  } else {
-    // Add new
-    customData[key].unshift(newRow); // put at top
-  }
-  
-  localStorage.setItem('customData', JSON.stringify(customData));
-  mergeCustomData();
-  render();
-  document.getElementById('editModal').classList.remove('active');
-});
-
-// Download HTML feature for persistence
-document.getElementById('downloadHtmlBtn')?.addEventListener('click', () => {
-  // To save changes permanently into the HTML file, we need to serialize DATA back into the script block.
-  // This is complex for a local static file, but we can instruct the user.
-  alert("현재까지 로컬에 저장된 모든 데이터가 적용된 화면입니다. 브라우저의 '페이지를 다른 이름으로 저장 (Ctrl+S 또는 Cmd+S)' 기능을 이용해 파일 자체를 덮어쓰기 하시면 영구적으로 저장할 수 있습니다.");
-});
-
-
 const searchInput = document.getElementById("globalSearch");
 const clearBtn = document.getElementById("clearSearch");
 searchInput.addEventListener("input", e => {
@@ -1078,8 +693,6 @@ clearBtn.addEventListener("click", () => {
 });
 
 /* init */
-for(let k in CONFIG) CONFIG[k].key = k;
-
 render();
 searchInput.focus();
 
